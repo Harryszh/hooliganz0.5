@@ -1,0 +1,47 @@
+
+
+services:
+  # PHP / Laravel
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hooliganz_app
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+
+  # MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: hooliganz_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: hooliganz
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  # Frontend (Vite Dev Server)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hooliganz_frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: npm run dev
+
+volumes:
+  mysql_data:
+
